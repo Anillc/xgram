@@ -13,7 +13,14 @@
         runtimeInputs = with pkgs; [ yarn-berry ];
         text = ''
           cd "$XGRAM_NIX"
-          exec yarn start
+          case "''${1:-start}" in
+            start) exec yarn start ;;
+            dev) exec yarn dev ;;
+            *)
+              echo "usage: xgram [start|dev]" >&2
+              exit 1
+              ;;
+          esac
         '';
       };
     in {
