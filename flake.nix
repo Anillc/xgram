@@ -102,7 +102,7 @@
         nativeBuildInputs = with pkgs; [ nodejs yarn-berry cacert ];
 
         outputHashMode = "recursive";
-        outputHash = "sha256-hvZCU2Sr6mvQMuWwUu0cacm8lWppk8T/MURj9Gnlxpk=";
+        outputHash = "sha256-5voxEqioCClptlKI1L53s55CkwX0aBuhN+WkisA15u4=";
         dontFixup = true;
 
         YARN_ENABLE_SCRIPTS = "0";
