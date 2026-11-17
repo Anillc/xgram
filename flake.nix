@@ -7,12 +7,13 @@
     self, nixpkgs, flake-parts, crossgram,
   }: flake-parts.lib.mkFlake { inherit inputs; } {
     systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
-    perSystem = { pkgs, ... }: {
+    perSystem = { pkgs, self', ... }: {
       devShells.default = pkgs.mkShell {
         buildInputs = with pkgs; [];
-        nativeBuildInputs = with pkgs; [ jq nodejs_24 yarn-berry ];
+        nativeBuildInputs = with pkgs; [ jq nodejs yarn-berry ];
       };
-      packages.default = pkgs.stdenv.mkDerivation {
+
+      packages.crossgram-packages = pkgs.stdenv.mkDerivation {
         name = "crossgram-packages";
         src = crossgram;
         nativeBuildInputs = with pkgs; [ jq nodejs yarn-berry yarn-berry.yarnBerryConfigHook ];
@@ -55,9 +56,66 @@
               name=$slug
             fi
             installed="$PWD/node_modules/$name"
+            # Yarn refuses to pack node_modules packages unless they look standalone.
             touch "$installed/yarn.lock"
             pack "$installed"
           done
+        '';
+      };
+
+      packages.yarn-deps = pkgs.stdenv.mkDerivation {
+        name = "xgram-yarn-deps";
+        src = pkgs.lib.fileset.toSource {
+          root = ./.;
+          fileset = pkgs.lib.fileset.unions [
+            ./package.json
+            ./.yarnrc.yml
+            ./yarn.lock
+          ];
+        };
+        nativeBuildInputs = with pkgs; [ nodejs yarn-berry cacert ];
+
+        outputHashMode = "recursive";
+        outputHash = "sha256-ZiamatI9bn1yWzAOpYjj/zJQHQjHXVVMZ6W33hXzNRU=";
+        dontFixup = true;
+
+        YARN_ENABLE_SCRIPTS = "0";
+        YARN_ENABLE_GLOBAL_CACHE = "0";
+
+        buildPhase = ''
+          export HOME=$(mktemp -d)
+          rm -rf tarballs
+          cp -r ${self'.packages.crossgram-packages} tarballs
+          yarn install --immutable
+        '';
+
+        installPhase = ''
+          mkdir -p "$out"
+          cp -r node_modules "$out/"
+        '';
+      };
+
+      packages.default = pkgs.writeShellApplication {
+        name = "xgram";
+        runtimeInputs = with pkgs; [ coreutils nodejs ];
+        text = ''
+          data="''${XGRAM_DATA:-$PWD}"
+          mkdir -p "$data"
+          if [[ ! -e "$data/package.json" ]]; then
+            cp ${./package.json} "$data/package.json"
+          fi
+          if [[ ! -e "$data/app.yml" ]]; then
+            cp ${./app.yml} "$data/app.yml"
+          fi
+          if [[ ! -e "$data/cordis.yml" ]]; then
+            cp ${./cordis.yml} "$data/cordis.yml"
+          fi
+          if [[ ! -d "$data/node_modules" ]]; then
+            ln -sfn "${self'.packages.yarn-deps}/node_modules" "$data/node_modules"
+          fi
+          cd "$data"
+          exec node --import tsx --import @cordisjs/unyaml \
+            "${self'.packages.yarn-deps}/node_modules/cordis/bin.js" run "$@"
         '';
       };
     };
