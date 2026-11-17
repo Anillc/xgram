@@ -10,11 +10,14 @@
   ],
   "license": "MIT",
   "scripts": {
+    "build": "node --import tsx scripts/build-client.mjs",
     "start": "cross-env NODE_OPTIONS=\"--import tsx --import @cordisjs/unyaml\" cordis run"
   },
   "devDependencies": {
     "@types/node": "^25.3.5",
-    "typescript": "^5.9.3"
+    "@vitejs/plugin-react": "^5.0.4",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.2"
   },
   "dependencies": {
     "@cordisjs/plugin-cli": "^1.1.2",

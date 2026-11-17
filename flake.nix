@@ -1,16 +1,35 @@
 {
   inputs.crossgram = {
-    url = "github:std-microblock/crossgram";
+    url = "github:std-microblock/crossgram/pull/19/head";
     flake = false;
   };
   outputs = inputs@{
     self, nixpkgs, flake-parts, crossgram,
   }: flake-parts.lib.mkFlake { inherit inputs; } {
     systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
-    perSystem = { pkgs, self', ... }: {
+    perSystem = { self', pkgs, ... }: let
+      xgram = pkgs.writeShellApplication {
+        name = "xgram";
+        runtimeInputs = with pkgs; [ yarn-berry ];
+        text = ''
+          cd "$XGRAM_NIX"
+          exec yarn start
+        '';
+      };
+    in {
       devShells.default = pkgs.mkShell {
         buildInputs = with pkgs; [];
-        nativeBuildInputs = with pkgs; [ jq nodejs yarn-berry ];
+        nativeBuildInputs = with pkgs; [ jq nodejs unzip yarn-berry xgram ];
+        shellHook = ''
+          if [[ ! -e node_modules || -L node_modules ]]; then
+            ln -sfn ${self'.packages.yarn-deps}/node_modules node_modules
+          else
+            echo "xgram: using existing node_modules (development mode)"
+          fi
+          ln -sfn ${self'.packages.crossgram-packages} tarballs
+          yarn build
+          export XGRAM_NIX="$PWD"
+        '';
       };
 
       packages.crossgram-packages = pkgs.stdenv.mkDerivation {
@@ -76,7 +95,7 @@
         nativeBuildInputs = with pkgs; [ nodejs yarn-berry cacert ];
 
         outputHashMode = "recursive";
-        outputHash = "sha256-ZiamatI9bn1yWzAOpYjj/zJQHQjHXVVMZ6W33hXzNRU=";
+        outputHash = "sha256-hvZCU2Sr6mvQMuWwUu0cacm8lWppk8T/MURj9Gnlxpk=";
         dontFixup = true;
 
         YARN_ENABLE_SCRIPTS = "0";
@@ -92,30 +111,6 @@
         installPhase = ''
           mkdir -p "$out"
           cp -r node_modules "$out/"
-        '';
-      };
-
-      packages.default = pkgs.writeShellApplication {
-        name = "xgram";
-        runtimeInputs = with pkgs; [ coreutils nodejs ];
-        text = ''
-          data="''${XGRAM_DATA:-$PWD}"
-          mkdir -p "$data"
-          if [[ ! -e "$data/package.json" ]]; then
-            cp ${./package.json} "$data/package.json"
-          fi
-          if [[ ! -e "$data/app.yml" ]]; then
-            cp ${./app.yml} "$data/app.yml"
-          fi
-          if [[ ! -e "$data/cordis.yml" ]]; then
-            cp ${./cordis.yml} "$data/cordis.yml"
-          fi
-          if [[ ! -d "$data/node_modules" ]]; then
-            ln -sfn "${self'.packages.yarn-deps}/node_modules" "$data/node_modules"
-          fi
-          cd "$data"
-          exec node --import tsx --import @cordisjs/unyaml \
-            "${self'.packages.yarn-deps}/node_modules/cordis/bin.js" run "$@"
         '';
       };
     };

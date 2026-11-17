@@ -221,4 +221,9 @@
         root:
           - external
           - packages
+          - src
           - app.yml
+- id: local-stickers
+  name: ./src/local-stickers/index.ts
+  config:
+    root: ./data/local-stickers

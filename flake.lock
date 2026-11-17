@@ -3,15 +3,16 @@
     "crossgram": {
       "flake": false,
       "locked": {
-        "lastModified": 1793859479,
-        "narHash": "sha256-CH7qcNANQ4GhYCD0Rfc4c+opfQBwmy1kQaCQFoEFeNw=",
+        "lastModified": 1794924642,
+        "narHash": "sha256-7SQnEKR6rQbFGtPy2P89kvx1BU/3Fx9zXZMng0GncD4=",
         "owner": "std-microblock",
         "repo": "crossgram",
-        "rev": "db3fdb5faa10fbce92b7cd6156f95656354cdbfa",
+        "rev": "839ad3357ad988cd141563638d63be0dec102822",
         "type": "github"
       },
       "original": {
         "owner": "std-microblock",
+        "ref": "pull/19/head",
         "repo": "crossgram",
         "type": "github"
       }
