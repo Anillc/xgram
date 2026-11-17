@@ -30,6 +30,7 @@
 
         installPhase = ''
           mkdir -p "$out"
+          node --import tsx scripts/build-webui.mjs
 
           pack() {
             local dir=$1 name version file

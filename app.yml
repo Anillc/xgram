@@ -1,0 +1,224 @@
+- id: 312edd83
+  name: '@cordisjs/plugin-timer'
+- id: 0a9ec786
+  name: '@cordisjs/plugin-http'
+- id: 4cd8d0ee
+  name: '@cordisjs/plugin-http-socks'
+- id: mtproto01
+  name: '@mtproto-relay/mtproto'
+  config:
+    port: 4430
+    host: 0.0.0.0
+    rsaKeyPath: ./data/rsa-key.json
+    authKeyStorePath: ./data/auth-keys.json
+- id: bridge01
+  name: '@mtproto-relay/bridge'
+  config:
+    serverHost: 127.0.0.1
+    groupFilesMiniApp:
+      enabled: true
+      path: /group-files
+      # Mobile Telegram clients need a reachable HTTPS URL through your reverse proxy.
+      # publicUrl: https://relay.example.com/group-files
+- id: merged-forward
+  name: '@mtproto-relay/merged-forward'
+- id: platform-admin-bot
+  name: '@mtproto-relay/platform-admin-bot'
+  config:
+    # Empty means every platform identity can manage only itself.
+    allowedPlatformSessionIds: []
+    crossAccountAccess: false
+    showLoginCodes: true
+    webuiUrl: ''
+- id: telegram-bot-api
+  name: '@mtproto-relay/telegram-bot-api'
+  config:
+    verifierSecret: ${TELEGRAM_BOT_TOKEN_VERIFIER_SECRET}
+- id: telegram-sticker-importer
+  name: '@mtproto-relay/telegram-sticker-importer'
+  disabled: true
+  config:
+    botToken: ${TELEGRAM_STICKER_IMPORTER_BOT_TOKEN}
+    # apiBase: http://127.0.0.1:8081 # optional Local Bot API Server
+    # maxImportsPerSession: 100
+    # importCooldownMs: 3000
+- id: qq-flash-transfer-bot
+  name: '@mtproto-relay/qq-flash-transfer-bot'
+  config: {}
+- id: satori-core
+  name: '@satorijs/core'
+  disabled: true
+- id: satori-server
+  name: '@satorijs/plugin-server'
+  disabled: true
+  config:
+    path: /satori
+    token: ${SATORI_TOKEN}
+    maxRequestBodyBytes: 8388608
+- id: satori-exporter
+  name: '@mtproto-relay/satori-exporter'
+  disabled: true
+  config:
+    platformId: qqnt
+    platform: qq
+- id: satori-platform
+  name: '@mtproto-relay/platform-satori'
+  disabled: true
+  config:
+    bot: ''
+- id: telegram-resources
+  name: '@mtproto-relay/telegram-resources'
+  config: {}
+- id: static
+  name: '@mtproto-relay/platform-static'
+  disabled: true
+  config:
+    eventIntervalMs: 20000
+- id: qqnt
+  name: '@mtproto-relay/platform-qqnt'
+  config:
+    webSocketEndpoint: ws://127.0.0.1:18767/v1/events/ws
+    grayTipFilters:
+      - 回应了你的
+- id: discord
+  name: '@mtproto-relay/platform-discord'
+  disabled: true
+  config:
+    token: null
+    proxy: null
+- id: matrix
+  name: '@mtproto-relay/platform-matrix'
+  disabled: true
+  config:
+    homeserver: https://matrix-client.matrix.org/_matrix/client/v3
+    proxy: http://127.0.0.1:7890
+    syncTimeoutMs: 30000
+    requestTimeoutMs: 30000
+- id: lark
+  name: '@mtproto-relay/platform-lark'
+  disabled: true
+  config:
+    appId: ${LARK_APP_ID}
+    appSecret: ${LARK_APP_SECRET}
+    # baseUrl: https://open.larksuite.com # Lark 国际版
+    # mode: user # 用户身份收发（默认 bot）
+    # publicUrl: https://relay.example.com # user 模式：OAuth 回调公网地址
+    # pollIntervalMs: 60000 # user 模式：轮询间隔
+- id: wechat
+  name: '@mtproto-relay/platform-wechat'
+  disabled: true
+  config:
+    endpoint: http://127.0.0.1:18888/api/
+    callbackPort: 23456
+    requestTimeoutMs: 30000
+    maxCallbackBytes: 1048576
+    maxCallbackConnections: 32
+- id: mtproto-debug
+  name: '@mtproto-relay/mtproto-debug'
+  config:
+    maxEvents: 2000
+    initiallyPaused: true
+- id: mtproto-statistics
+  name: '@mtproto-relay/mtproto-statistics'
+  config:
+    sampleIntervalMs: 1000
+    slowThresholdMs: 1000
+    historySeconds: 900
+- id: history-backfill
+  name: '@mtproto-relay/history-backfill'
+  config:
+    enabled: true
+    idleAfterMs: 60000
+    intervalMs: 3000
+    pageSize: 50
+    dailyRequestCap: 3000
+    maxAgeDays: 180
+- id: fa2b056a
+  name: '@cordisjs/plugin-server'
+  config:
+    port: 3140
+    maxWebSocketPayload: 4194304
+- id: aa143c36
+  name: '@cordisjs/plugin-server-acl'
+- id: 8357f09b
+  name: '@cordisjs/plugin-group'
+  label: Database
+  config:
+    - id: 5b69b05e
+      name: '@cordisjs/plugin-database'
+    - id: 07c0d352
+      name: '@cordisjs/plugin-database-sqlite'
+      config:
+        path: ./data/cordis.db
+        journalMode: wal
+        busyTimeout: 5000
+    - id: 0cb55d6c
+      name: '@cordisjs/plugin-database-mysql'
+      disabled: true
+    - id: ae5ffd0d
+      name: '@cordisjs/plugin-database-postgres'
+      disabled: true
+    - id: 5c1993ac
+      name: '@cordisjs/plugin-database-mongo'
+      disabled: true
+- id: update-store-database
+  name: '@mtproto-relay/update-store-database'
+  config:
+    retention: 10000
+- id: debug-scripts
+  name: '@mtproto-relay/debug-scripts'
+  config:
+    root: ./data/debug-scripts
+    results: ./data/debug-results
+    ttl: 1800000
+- id: 7bf6f701
+  name: '@cordisjs/plugin-group'
+  label: SSO
+  config:
+    - id: ee017963
+      name: '@cordisjs/plugin-sso'
+    - id: 8d3a0f12
+      name: '@cordisjs/plugin-sso-server'
+    - id: 45bc2d91
+      name: '@cordisjs/plugin-sso-password'
+    - id: 03dd4465
+      name: '@cordisjs/plugin-sso-webauthn'
+      disabled: true
+    - id: dcff0bd1
+      name: '@cordisjs/plugin-sso-oauth'
+      disabled: true
+- id: 0c9db8e2
+  name: '@cordisjs/plugin-group'
+  label: WebUI
+  config:
+    - id: 4430a808
+      name: 'cordis-webui-react'
+    - id: f64a9366
+      name: '@cordisjs/plugin-database-webui'
+    - id: 03ebc689
+      name: '@cordisjs/plugin-http-webui'
+    - id: 8a9b6184
+      name: '@cordisjs/plugin-insight'
+    - id: 7c7aff7a
+      name: '@cordisjs/plugin-loader-webui'
+    - id: 7adac547
+      name: '@cordisjs/plugin-logger-webui'
+    - id: afe4937f
+      name: '@cordisjs/plugin-market'
+    - id: 539bc93a
+      name: '@cordisjs/plugin-notifier'
+    - id: 126b4c42
+      name: 'cordis-webui-react/server'
+    - id: f9c1a8b2
+      name: '@cordisjs/plugin-webui-sso'
+- id: 375b963c
+  name: '@cordisjs/plugin-group'
+  label: Development
+  config:
+    - id: e1e36558
+      name: '@cordisjs/plugin-hmr'
+      config:
+        root:
+          - external
+          - packages
+          - app.yml
