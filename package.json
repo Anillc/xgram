@@ -12,7 +12,8 @@
   "scripts": {
     "build": "node --import tsx scripts/build-client.mjs",
     "dev": "cross-env NODE_ENV=development NODE_OPTIONS=\"--import tsx --import @cordisjs/unyaml\" cordis run ./app.dev.yml",
-    "start": "cross-env NODE_ENV=production NODE_OPTIONS=\"--import tsx --import @cordisjs/unyaml\" cordis run ./app.yml"
+    "start": "cross-env NODE_ENV=production NODE_OPTIONS=\"--import tsx --import @cordisjs/unyaml\" cordis run ./app.yml",
+    "test": "node --test \"src/**/*.test.ts\""
   },
   "devDependencies": {
     "@types/node": "^25.3.5",
