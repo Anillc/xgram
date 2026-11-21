@@ -18,6 +18,7 @@ import { tmpdir } from 'node:os'
 import { dirname, join, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
+import { stickerContentId } from './sticker-id'
 import type { Context } from 'cordis'
 import type {
   IMMediaSource, IMSticker, IMStickerAsset, IMStickerPack, IMStickerPackPage,
@@ -206,7 +207,9 @@ async function buildPack(base: string, value: QaPath, staging: string): Promise<
       const data = await readFile(source)
       const meta = imageMeta(data, fileName)
       if (meta.mimeType === 'application/octet-stream') continue
-      const id = String(stickers.length + 1).padStart(3, '0')
+      const id = stickerContentId(item.MD5, data)
+      // 同一个包里出现两张一模一样的图时只留一份，别让两个条目抢同一个 id。
+      if (stickers.some((sticker) => sticker.id === id)) continue
       const output = `${id}.${extensionFor(meta.mimeType)}`
       await copyFile(source, join(stagingPack, output))
 
